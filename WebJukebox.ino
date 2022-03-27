@@ -125,7 +125,7 @@ title* currentTitle=NULL;
 uint32_t currentTitleTimestamp;
 
 const title  liszt("LISZT.MID",       "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 8");
-const title  messiaen("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste", "5, 10, 2");
+const title  messiaen("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 2");
 const title  buxtehude("BUXTEHUD.MID","Dietrich Buxtehude : Passacaille (7')", "5, 425, 8");
 const title  wagner("WAGNER.MID",     "Richard Wagner : Mort d'Isolde (8'40)", "8, 520, 8");
 const title  dupre("DUPRE.MID",       "Marcel Dupré : Prélude et Fugue en sol mineur", "8, 300, 8");
