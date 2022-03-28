@@ -177,7 +177,7 @@ table {width: 100%;}
 <body><table><tr>
 <td><svg id='logo' version="1.1"
      baseProfile="full"
-     width="30" height="20"
+     width="180" height="150"
      xmlns="http://www.w3.org/2000/svg">
   <rect width="100%" height="100%" fill="black" />
 </svg>
@@ -190,7 +190,7 @@ var xmlns = "http://www.w3.org/2000/svg";
 pipe = function(x, y, height, width, mouth){
 	var polygon = document.createElementNS(xmlns, "polygon");
 	var mwidth=height/60
-	polygon.setAttribute("style","fill:black;stroke:green;")
+	polygon.setAttribute("style","fill:black;stroke:white;")
 	var points=(x+width/2).toString()+','+(y-mouth).toString()
 	points+=' '+(x-width/2).toString()+','+(y-mouth).toString()
 	points+=' '+(x-width/2).toString()+','+(y-mouth-height).toString()
@@ -234,7 +234,7 @@ logo = function(x0, y0, scale){
 	var x7=plateface(nA, x6, y0-dy, s*77, s*88, wA, s*17, s*17, true)+p
 }
 
-logo(250, 480, 0.7)
+logo(10, 120, 1)
 </script>
 )";
 const char * pageFooter = "</body></html>";
