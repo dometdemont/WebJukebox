@@ -5,8 +5,8 @@
 SdFat  SD;
 MD_MIDIFile SMF;
 
-#define SSID      "d3m"
-#define KEY       "buxtehude"
+#define SSID      "orgue"
+#define KEY       "Ruche.1943"
 // check your access point's security mode, mine was WPA20-PSK
 // if yours is different you'll need to change the AUTH constant, see the file WiFly.h for avalable security codes
 #define AUTH      WIFLY_AUTH_WPA2_PSK
@@ -30,7 +30,7 @@ char userOutput[800];
 
 #else // don't use MIDI to allow printing debug statements
 
-#define DEBUGS(s)     Serial.print(s)
+#define DEBUGS(s)     Serial.print(s);
 #define DEBUG(s, x)   { Serial.print(F(s)); Serial.print(x); }
 #define DEBUGX(s, x)  { Serial.print(F(s)); Serial.print(x, HEX); }
 #define SERIAL_RATE 57600
@@ -115,6 +115,8 @@ class title {
     title(const char* aFile, const char* aDescription, const char* aTiming);
     void start();
     void cancel();
+    void pause();
+    void resume();
     uint16_t getHtmlEntry(bool emit);
     const char* file;
     const char* description;
@@ -123,16 +125,20 @@ class title {
 
 title* currentTitle=NULL;
 uint32_t currentTitleTimestamp;
+uint32_t pauseTimestamp;
 
 const title  liszt("LISZT.MID",       "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20");
-const title  messiaen("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 20");
-const title  buxtehude("BUXTEHUD.MID","Dietrich Buxtehude : Passacaille (7')", "5, 425, 20");
+const title  messiaen("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 10");
 const title  wagner("WAGNER.MID",     "Richard Wagner : Mort d'Isolde (8'40)", "8, 520, 20");
-const title  dupre("DUPRE.MID",       "Marcel Dupré : Prélude et Fugue en sol mineur", "8, 300, 20");
+const title  dupre("DUPRE.MID",       "Marcel Dupré : Prélude et Fugue en sol mineur", "12, 403, 10");
 const title  taille("COUPERIN.MID",   "François Couperin : Tierce en taille (4')", "6, 240, 20");
 const title  franck("FRANCK.MID",     "César Franck : Troisième Choral (10'20)", "13, 622, 20");
 const title  chromorne("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "7, 233, 20");
-const title *playList[] = {&liszt, &franck, &wagner, &buxtehude, &chromorne, &messiaen};
+const title  abba("FERNANDO.MID",  "ABBA: Fernando karaoke (4')", "2, 255, 3");
+const title  langlais("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "6, 150, 4");
+const title  guilmant("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "8, 136, 4");
+const title *playList[] = {&liszt, &franck, &dupre, &wagner, &chromorne, &taille, &messiaen, &langlais, &guilmant, &abba};
+
 
 title::title(const char* aFile, const char* aDescription,  const char* aTiming){
   file = aFile;
@@ -153,6 +159,22 @@ void title::cancel(){
   DEBUG("Now stopping: ", description);
   SMF.close();
 }
+void title::pause(){
+  if(currentTitle==NULL)return;
+  DEBUG("Now pausing: ", description);
+  SMF.pause(true);
+  midiSilence();
+  pauseTimestamp=millis();
+}
+void title::resume(){
+  if(pauseTimestamp==0 || currentTitle==NULL)return;
+  DEBUG("Now resuming: ", description);
+  SMF.pause(false);
+  uint32_t elapsedPause=millis()-pauseTimestamp;
+  currentTitleTimestamp+=elapsedPause;
+  pauseTimestamp=0;  
+}
+
 uint16_t title::getHtmlEntry(bool emit){
   return 
     getLengthAndSend("<li><a href=\"", emit)+
@@ -185,14 +207,22 @@ table {width: 100%;}
 <td><h1>Les grandes orgues</h1><h2>de la Basilique St Joseph de Grenoble</h2></tr></td>
 </table>
 <script>
-var xmlns="http://www.w3.org/2000/svg";pipe=function(t,e,n,r,o){var i=document.createElementNS(xmlns,"polygon"),a=n/60;i.setAttribute("style","fill:black;stroke:green;");var g=(t+r/2).toString()+","+(e-o).toString();return g+=" "+(t-r/2).toString()+","+(e-o).toString(),g+=" "+(t-r/2).toString()+","+(e-o-n).toString(),g+=" "+(t+r/2).toString()+","+(e-o-n).toString(),g+=" "+(t+r/2).toString()+","+(e-o).toString(),g+=" "+t.toString()+","+e.toString(),g+=" "+(t-r/2).toString()+","+(e-o).toString(),g+=" "+(t-r/2).toString()+","+(e-o-a).toString(),g+=" "+(t+r/2).toString()+","+(e-o-a).toString(),i.setAttribute("points",g),i},plateface=function(e,n,r,t,o,i,a,g,l){var S=(o-t)/(e-1),p=(g-a)/(e-1);l&&(S*=2,p*=2);var c=t,f=a;for(let t=0;t<e;t++)l&&t==~~(e/2)&&(S*=-1,p*=-1),document.getElementById("logo").appendChild(pipe(n+t*(i+0),r,c,i,f)),c+=S,f+=p;return n+i/2+(e-1)*(i+0)},logo=function(t,e,n){var r=n,o=7*r,i=4.5*r,a=5*r,g=3*r,l=3*r,n=2*r,t=plateface(3,t,e-o,77*r,88*r,a,17*r,17*r,!0)+i,t=plateface(5,t,e-o,68*r,42*r,g,13*r,17*r,!1)+i,t=plateface(10,t,e,42*r,30*r,l,11*r,11*r,!1)+i,n=plateface(9,t,e,32*r,41*r,n,11*r,6*r,!0)+i,l=plateface(10,n,e,30*r,42*r,l,11*r,11*r,!1)+i,g=plateface(5,l,e-o,42*r,68*r,g,17*r,13*r,!1)+i;plateface(3,g,e-o,77*r,88*r,a,17*r,17*r,!0)};
+var xmlns="http://www.w3.org/2000/svg";pipe=function(t,e,n,r,o){var i=document.createElementNS(xmlns,"polygon"),a=n/60;i.setAttribute("style","fill:black;stroke:orange;");var g=(t+r/2).toString()+","+(e-o).toString();return g+=" "+(t-r/2).toString()+","+(e-o).toString(),g+=" "+(t-r/2).toString()+","+(e-o-n).toString(),g+=" "+(t+r/2).toString()+","+(e-o-n).toString(),g+=" "+(t+r/2).toString()+","+(e-o).toString(),g+=" "+t.toString()+","+e.toString(),g+=" "+(t-r/2).toString()+","+(e-o).toString(),g+=" "+(t-r/2).toString()+","+(e-o-a).toString(),g+=" "+(t+r/2).toString()+","+(e-o-a).toString(),i.setAttribute("points",g),i},plateface=function(e,n,r,t,o,i,a,g,l){var S=(o-t)/(e-1),p=(g-a)/(e-1);l&&(S*=2,p*=2);var c=t,f=a;for(let t=0;t<e;t++)l&&t==~~(e/2)&&(S*=-1,p*=-1),document.getElementById("logo").appendChild(pipe(n+t*(i+0),r,c,i,f)),c+=S,f+=p;return n+i/2+(e-1)*(i+0)},logo=function(t,e,n){var r=n,o=7*r,i=4.5*r,a=5*r,g=3*r,l=3*r,n=2*r,t=plateface(3,t,e-o,77*r,88*r,a,17*r,17*r,!0)+i,t=plateface(5,t,e-o,68*r,42*r,g,13*r,17*r,!1)+i,t=plateface(10,t,e,42*r,30*r,l,11*r,11*r,!1)+i,n=plateface(9,t,e,32*r,41*r,n,11*r,6*r,!0)+i,l=plateface(10,n,e,30*r,42*r,l,11*r,11*r,!1)+i,g=plateface(5,l,e-o,42*r,68*r,g,17*r,13*r,!1)+i;plateface(3,g,e-o,77*r,88*r,a,17*r,17*r,!0)};
 logo(10, 120, 1)
 </script>
 )";
 const char * pageFooter = "</body></html>";
-const char *refreshOrCancel = R"(
+const char *refreshPauseCancel = R"(
 </p><table><tr>
 <td align=left><a href='/cancel'>Arrêter</a></td>
+<td align=center><a href='/pause'>Pause</a></td>
+<td align=right><a id='refresh' href='/'>Mettre à jour</a></td>
+</tr></table>
+)";
+const char *refreshResumeCancel = R"(
+</p><table><tr>
+<td align=left><a href='/cancel'>Arrêter</a></td>
+<td align=center><a href='/resume'>Reprendre</a></td>
 <td align=right><a id='refresh' href='/'>Mettre à jour</a></td>
 </tr></table>
 )";
@@ -244,6 +274,13 @@ uint16_t getPageBody(char* request, bool emit){
   // number of elements in array
   int const n = sizeof( playList ) / sizeof( playList[ 0 ] );
   int i;
+  // Check for a pause/resume request
+  if(currentTitle != NULL && strstr(request, "pause") != NULL){
+    currentTitle->pause();
+  }
+  if(currentTitle != NULL && strstr(request, "resume") != NULL){
+    currentTitle->resume();
+  }
   // Check for a cancel request
   if(currentTitle != NULL && strstr(request, "cancel") != NULL){
     currentTitle->cancel();
@@ -266,7 +303,7 @@ uint16_t getPageBody(char* request, bool emit){
       title *e = (title*)playList[i];
       pageLength+=e->getHtmlEntry(emit);
     }
-    pageLength+=getLengthAndSend(refreshOrCancel, emit);    
+    pageLength+=getLengthAndSend(pauseTimestamp==0 ? refreshPauseCancel:refreshResumeCancel, emit);    
   }
   
   if(i >= 0){
@@ -280,16 +317,20 @@ uint16_t getPageBody(char* request, bool emit){
     // push the page for this title
     pageLength+=getLengthAndSend("<h3>Œuvre en cours d'audition :</h3><p>", emit);
     pageLength+=getLengthAndSend(playList[i]->description, emit);
-    pageLength+=getLengthAndSend(refreshOrCancel, emit);
-    pageLength+=getLengthAndSend(countDownBegin, emit);
-    pageLength+=getLengthAndSend(playList[i]->timing, emit);
-    {
-      char remain[10]; 
-      sprintf(remain, ",%d", (millis()-currentTitleTimestamp)/1000);
-      pageLength+=getLengthAndSend(remain, emit);
+    if(pauseTimestamp==0){
+      pageLength+=getLengthAndSend(refreshPauseCancel, emit);  
+      pageLength+=getLengthAndSend(countDownBegin, emit);
+      pageLength+=getLengthAndSend(playList[i]->timing, emit);
+      {
+        char remain[10]; 
+        sprintf(remain, ",%d", (millis()-currentTitleTimestamp)/1000);
+        pageLength+=getLengthAndSend(remain, emit);
+      }
+      pageLength+=getLengthAndSend(countDownEnd, emit);
     }
-    pageLength+=getLengthAndSend(countDownEnd, emit);
-    
+    else{
+      pageLength+=getLengthAndSend(refreshResumeCancel, emit);
+    }  
   }
   return pageLength;
 }
@@ -299,8 +340,9 @@ void setup()
     memset(userOutput, 0, sizeof(userOutput));
     DEBUGS("Starting...");
     
-    // No current title
+    // No current title, no pause
     currentTitle=NULL;
+    pauseTimestamp=0;
     
     wiflyUart.begin(9600); // start wifi shield uart port
     Serial.begin(SERIAL_RATE);
@@ -340,7 +382,8 @@ void setup()
     DEBUGS("Web server ready: ");
 
     if(!SD.begin(chipSelect, SPI_FULL_SPEED) )DEBUGS("Error SD")
-    else DEBUGS("\nSD init successful");
+    else 
+      DEBUGS("\nSD init successful");
 
     // Initialize MIDIFile
     SMF.begin(&SD);
