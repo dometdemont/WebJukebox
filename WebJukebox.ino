@@ -128,7 +128,7 @@ uint32_t currentTitleTimestamp;
 uint32_t pauseTimestamp;
 
 const title  liszt("LISZT.MID",       "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20");
-const title  messiaen("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 10");
+const title  messiaen("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19");
 const title  wagner("WAGNER.MID",     "Richard Wagner : Mort d'Isolde (8'40)", "8, 520, 20");
 const title  dupre("DUPRE.MID",       "Marcel Dupré : Prélude et Fugue en sol mineur", "12, 403, 10");
 const title  taille("COUPERIN.MID",   "François Couperin : Tierce en taille (4')", "6, 240, 20");
@@ -231,7 +231,7 @@ const char *countDownBegin = R"(
 <p id="countDown"></p>
 <script>
 var distances=[)";
-const char *countDownEnd=R"(,0]
+const char *countDownEnd=R"(]
 var phases=["Chargement : ", "Exécution : ", "Déchargement : "]
 // Update the count down every 1 second
 var rate=1000;
