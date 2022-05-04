@@ -133,11 +133,11 @@ const title  wagner("WAGNER.MID",     "Richard Wagner : Mort d'Isolde (8'40)", "
 const title  dupre("DUPRE.MID",       "Marcel Dupré : Prélude et Fugue en sol mineur", "12, 403, 10");
 const title  taille("COUPERIN.MID",   "François Couperin : Tierce en taille (4')", "6, 240, 20");
 const title  franck("FRANCK.MID",     "César Franck : Troisième Choral (10'20)", "13, 622, 20");
-const title  chromorne("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "7, 233, 20");
-const title  abba("FERNANDO.MID",  "ABBA: Fernando karaoke (4')", "2, 255, 3");
+const title  chromorne("CHROMORN.MID","François Couperin : Chromorne en taille (4')", "7, 233, 20");
+const title  toccata("TOCAREM.MID",   "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5");
 const title  langlais("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "6, 150, 4");
 const title  guilmant("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "8, 136, 4");
-const title *playList[] = {&liszt, &franck, &dupre, &wagner, &chromorne, &taille, &messiaen, &langlais, &guilmant, &abba};
+const title *playList[] = {&liszt, &franck, &dupre, &wagner, &chromorne, &taille, &messiaen, &langlais, &guilmant, &toccata};
 
 
 title::title(const char* aFile, const char* aDescription,  const char* aTiming){
@@ -158,6 +158,7 @@ void title::cancel(){
   if(currentTitle==NULL)return;
   DEBUG("Now stopping: ", description);
   SMF.close();
+  pauseTimestamp=0;  
 }
 void title::pause(){
   if(currentTitle==NULL)return;
@@ -216,14 +217,14 @@ const char *refreshPauseCancel = R"(
 </p><table><tr>
 <td align=left><a href='/cancel'>Arrêter</a></td>
 <td align=center><a href='/pause'>Pause</a></td>
-<td align=right><a id='refresh' href='/'>Mettre à jour</a></td>
+<td align=right><a id='refresh' href='/'>Actualiser</a></td>
 </tr></table>
 )";
 const char *refreshResumeCancel = R"(
 </p><table><tr>
 <td align=left><a href='/cancel'>Arrêter</a></td>
 <td align=center><a href='/resume'>Reprendre</a></td>
-<td align=right><a id='refresh' href='/'>Mettre à jour</a></td>
+<td align=right><a id='refresh' href='/'>Actualiser</a></td>
 </tr></table>
 )";
 
